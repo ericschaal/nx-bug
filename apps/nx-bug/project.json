@@ -6,7 +6,9 @@
   "targets": {
     "build": {
       "executor": "@nrwl/next:build",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "defaultConfiguration": "production",
       "options": {
         "root": "apps/nx-bug",
@@ -17,23 +19,29 @@
           "outputPath": "apps/nx-bug"
         },
         "production": {}
-      }
+      },
+      "dependsOn": [
+        "build-custom-server"
+      ]
     },
     "serve": {
       "executor": "@nrwl/next:server",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "nx-bug:build",
-        "dev": true
+        "dev": true,
+        "customServerTarget": "nx-bug:serve-custom-server"
       },
       "configurations": {
         "development": {
           "buildTarget": "nx-bug:build:development",
-          "dev": true
+          "dev": true,
+          "customServerTarget": "nx-bug:serve-custom-server:development"
         },
         "production": {
           "buildTarget": "nx-bug:build:production",
-          "dev": false
+          "dev": false,
+          "customServerTarget": "nx-bug:serve-custom-server:production"
         }
       }
     },
@@ -45,7 +53,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/nx-bug/jest.config.ts",
         "passWithNoTests": true
@@ -53,9 +63,43 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/nx-bug/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": [
+          "apps/nx-bug/**/*.{ts,tsx,js,jsx}"
+        ]
+      }
+    },
+    "build-custom-server": {
+      "executor": "@nrwl/js:tsc",
+      "defaultConfiguration": "production",
+      "options": {
+        "outputPath": "dist/apps/nx-bug",
+        "main": "apps/nx-bug/server/main.ts",
+        "tsConfig": "apps/nx-bug/tsconfig.server.json",
+        "clean": false,
+        "assets": []
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve-custom-server": {
+      "executor": "@nrwl/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "nx-bug:build-custom-server"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "nx-bug:build-custom-server:development"
+        },
+        "production": {
+          "buildTarget": "nx-bug:build-custom-server:production"
+        }
       }
     }
   },
